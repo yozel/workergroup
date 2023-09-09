@@ -2,9 +2,12 @@ package workergroup
 
 import (
 	"context"
-	"log"
 	"sync"
+
+	"log/slog"
 )
+
+var Logger = slog.Default()
 
 type Worker func(ctx context.Context)
 
@@ -24,15 +27,15 @@ func New() *WorkerGroup {
 }
 
 func (wgx *WorkerGroup) Add(name string, fn Worker) {
-	log.Printf("Adding worker %s", name)
+	Logger.Debug("Adding worker", "worker", name)
 	wgx.wg.Add(1)
 	go func() {
 		defer wgx.wg.Done()
-		log.Printf("Worker: starting %s", name)
+		Logger.Debug("Worker starting", "worker", name)
 		fn(wgx.ctx)
-		log.Printf("Worker: finished %s", name)
+		Logger.Debug("Worker finished", "worker", name)
 	}()
-	log.Printf("Worker %s added", name)
+	Logger.Debug("Worker added", "worker", name)
 }
 
 func (wgx *WorkerGroup) Wait() {

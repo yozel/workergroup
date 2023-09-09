@@ -2,7 +2,6 @@ package workergroup
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -13,7 +12,7 @@ func HttpServerWorker(server *http.Server) Worker {
 		func() {
 			if err := server.ListenAndServe(); err != nil {
 				if err != http.ErrServerClosed {
-					log.Printf("error while listening http server: %s", err)
+					Logger.Error("error while listening http server", "err", err)
 				}
 			}
 		},
@@ -21,7 +20,7 @@ func HttpServerWorker(server *http.Server) Worker {
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
 			if err := server.Shutdown(ctx); err != nil {
-				log.Printf("error while stopping http server: %s", err)
+				Logger.Error("error while stopping http server", "err", err)
 			}
 		},
 	)
